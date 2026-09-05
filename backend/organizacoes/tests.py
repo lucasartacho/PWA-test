@@ -76,3 +76,37 @@ class LoginAPITests(APITestCase):
             url, {"cnpj": "12345678000199", "password": "senha-errada"}, format="json"
         )
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+
+class OrganizacaoMeAPITests(APITestCase):
+    def setUp(self):
+        self.organizacao = Organizacao.objects.create_user(
+            cnpj="12345678000199",
+            nome="Coop Teste",
+            razao_social="Cooperativa Teste LTDA",
+            password="senha-segura-123",
+        )
+        self.url = reverse("organizacao-me")
+
+    def test_requer_autenticacao(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_retorna_perfil_proprio(self):
+        self.client.force_authenticate(user=self.organizacao)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["cnpj"], "12345678000199")
+
+    def test_atualiza_perfil_proprio(self):
+        self.client.force_authenticate(user=self.organizacao)
+        response = self.client.patch(self.url, {"nome": "Novo Nome"}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.organizacao.refresh_from_db()
+        self.assertEqual(self.organizacao.nome, "Novo Nome")
+
+    def test_exclui_propria_conta(self):
+        self.client.force_authenticate(user=self.organizacao)
+        response = self.client.delete(self.url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Organizacao.objects.filter(cnpj="12345678000199").exists())
