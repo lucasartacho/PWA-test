@@ -15,6 +15,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "health",
     "organizacoes",
+    "agricultores",
 ]
 
 MIDDLEWARE = [
