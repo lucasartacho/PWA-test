@@ -1,4 +1,7 @@
 from django.test import TestCase
+from django.urls import reverse
+from rest_framework import status
+from rest_framework.test import APITestCase
 
 from .models import Organizacao
 
@@ -28,3 +31,20 @@ class OrganizacaoManagerTests(TestCase):
                 razao_social="Coop B LTDA",
                 password="outra-senha",
             )
+
+
+class OrganizacaoCadastroAPITests(APITestCase):
+    def test_cadastro_cria_organizacao(self):
+        url = reverse("organizacao-cadastro")
+        payload = {
+            "cnpj": "12345678000199",
+            "nome": "Coop Teste",
+            "razao_social": "Cooperativa Teste LTDA",
+            "exclusivamente_agricultura_familiar": True,
+            "password": "senha-segura-123",
+        }
+        response = self.client.post(url, payload, format="json")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertNotIn("password", response.data)
+        org = Organizacao.objects.get(cnpj="12345678000199")
+        self.assertTrue(org.check_password("senha-segura-123"))
