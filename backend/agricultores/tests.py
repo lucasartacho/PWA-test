@@ -1,4 +1,7 @@
 from django.test import TestCase
+from django.urls import reverse
+from rest_framework import status
+from rest_framework.test import APITestCase
 
 from organizacoes.models import Organizacao
 
@@ -29,3 +32,44 @@ class AgricultorModelTests(TestCase):
             Agricultor.objects.create(
                 organizacao=self.organizacao, nome="Outra", cpf="12345678900"
             )
+
+
+class AgricultorAPITests(APITestCase):
+    def setUp(self):
+        self.org_a = Organizacao.objects.create_user(
+            cnpj="11111111000191",
+            nome="Org A",
+            razao_social="Org A LTDA",
+            password="senha123456",
+        )
+        self.org_b = Organizacao.objects.create_user(
+            cnpj="22222222000192",
+            nome="Org B",
+            razao_social="Org B LTDA",
+            password="senha123456",
+        )
+        self.agricultor_a = Agricultor.objects.create(
+            organizacao=self.org_a, nome="Agricultor A", cpf="11111111111"
+        )
+
+    def test_lista_so_mostra_agricultores_da_propria_organizacao(self):
+        self.client.force_authenticate(user=self.org_b)
+        response = self.client.get(reverse("agricultor-list-create"))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 0)
+
+    def test_cadastro_associa_organizacao_logada_automaticamente(self):
+        self.client.force_authenticate(user=self.org_a)
+        payload = {"nome": "Novo Agricultor", "cpf": "22222222222"}
+        response = self.client.post(
+            reverse("agricultor-list-create"), payload, format="json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        agricultor = Agricultor.objects.get(cpf="22222222222")
+        self.assertEqual(agricultor.organizacao, self.org_a)
+
+    def test_organizacao_nao_acessa_agricultor_de_outra(self):
+        self.client.force_authenticate(user=self.org_b)
+        url = reverse("agricultor-detail", args=[self.agricultor_a.id])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
