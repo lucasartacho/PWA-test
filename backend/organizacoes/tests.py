@@ -48,3 +48,31 @@ class OrganizacaoCadastroAPITests(APITestCase):
         self.assertNotIn("password", response.data)
         org = Organizacao.objects.get(cnpj="12345678000199")
         self.assertTrue(org.check_password("senha-segura-123"))
+
+
+class LoginAPITests(APITestCase):
+    def setUp(self):
+        self.organizacao = Organizacao.objects.create_user(
+            cnpj="12345678000199",
+            nome="Coop Teste",
+            razao_social="Cooperativa Teste LTDA",
+            password="senha-segura-123",
+        )
+
+    def test_login_com_credenciais_validas(self):
+        url = reverse("token_obtain_pair")
+        response = self.client.post(
+            url,
+            {"cnpj": "12345678000199", "password": "senha-segura-123"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("access", response.data)
+        self.assertIn("refresh", response.data)
+
+    def test_login_com_senha_errada(self):
+        url = reverse("token_obtain_pair")
+        response = self.client.post(
+            url, {"cnpj": "12345678000199", "password": "senha-errada"}, format="json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
