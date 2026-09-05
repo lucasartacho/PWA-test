@@ -63,7 +63,7 @@ PWA-test/
 Três serviços em uma rede compartilhada:
 
 | Serviço | Base | Porta (host) | Notas |
-|---|---|---|---|
+|---------|------|--------------|-------|
 | `db` | `postgres:16-alpine` | 5432 | Volume nomeado para persistir dados |
 | `backend` | Python 3.12 | 8000 | Volume bind-mount de `./backend`; `depends_on` com healthcheck do `db` |
 | `frontend` | Node 20 | 5173 | Volume bind-mount de `./frontend` |
