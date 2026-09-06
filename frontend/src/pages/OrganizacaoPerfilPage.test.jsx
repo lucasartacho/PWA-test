@@ -59,4 +59,25 @@ describe("OrganizacaoPerfilPage", () => {
       expect(screen.getByText("Não foi possível carregar o perfil")).toBeInTheDocument()
     );
   });
+
+  it("mostra um erro quando falha ao excluir o perfil, sem navegar", async () => {
+    vi.spyOn(organizacaoApi, "getPerfil").mockResolvedValue({
+      nome: "Coop Teste",
+      razao_social: "Cooperativa Teste LTDA",
+      exclusivamente_agricultura_familiar: true,
+    });
+    vi.spyOn(organizacaoApi, "excluirPerfil").mockRejectedValue(
+      new Error("Não foi possível excluir o perfil")
+    );
+    renderPage();
+
+    await waitFor(() => expect(screen.getByDisplayValue("Coop Teste")).toBeInTheDocument());
+    await userEvent.click(screen.getByRole("button", { name: "Excluir organização" }));
+    await userEvent.click(screen.getByRole("button", { name: "Excluir" }));
+
+    await waitFor(() =>
+      expect(screen.getByText("Não foi possível excluir o perfil")).toBeInTheDocument()
+    );
+    expect(screen.queryByText("Login Stub")).not.toBeInTheDocument();
+  });
 });

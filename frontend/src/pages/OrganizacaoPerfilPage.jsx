@@ -51,9 +51,14 @@ export default function OrganizacaoPerfilPage() {
   }
 
   async function handleExcluir() {
-    await excluirPerfil();
-    await logout();
-    navigate("/organizacao");
+    try {
+      await excluirPerfil();
+      await logout();
+      navigate("/organizacao");
+    } catch (err) {
+      setError(err.message);
+      setConfirmandoExclusao(false);
+    }
   }
 
   if (form === null) {
