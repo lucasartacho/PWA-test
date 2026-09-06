@@ -31,8 +31,8 @@ describe("OrganizacaoLoginPage", () => {
     );
     renderPage();
 
-    await userEvent.type(screen.getByLabelText("CNPJ"), "12345678000199");
-    await userEvent.type(screen.getByLabelText("Senha"), "senha-segura-123");
+    await userEvent.type(screen.getByLabelText(/^CNPJ/i), "12345678000199");
+    await userEvent.type(screen.getByLabelText(/^Senha/i), "senha-segura-123");
     await userEvent.click(screen.getByRole("button", { name: "Entrar" }));
 
     await waitFor(() => expect(screen.getByText("Dashboard Stub")).toBeInTheDocument());
@@ -42,8 +42,8 @@ describe("OrganizacaoLoginPage", () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(null, { status: 401 })));
     renderPage();
 
-    await userEvent.type(screen.getByLabelText("CNPJ"), "12345678000199");
-    await userEvent.type(screen.getByLabelText("Senha"), "senha-errada");
+    await userEvent.type(screen.getByLabelText(/^CNPJ/i), "12345678000199");
+    await userEvent.type(screen.getByLabelText(/^Senha/i), "senha-errada");
     await userEvent.click(screen.getByRole("button", { name: "Entrar" }));
 
     await waitFor(() =>

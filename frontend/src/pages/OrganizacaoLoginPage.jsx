@@ -47,7 +47,6 @@ export default function OrganizacaoLoginPage() {
             onChange={(e) => setCnpj(e.target.value)}
             required
             fullWidth
-            InputLabelProps={{ required: false }}
           />
           <TextField
             label="Senha"
@@ -56,7 +55,6 @@ export default function OrganizacaoLoginPage() {
             onChange={(e) => setPassword(e.target.value)}
             required
             fullWidth
-            InputLabelProps={{ required: false }}
           />
           <Button type="submit" variant="contained" disabled={loading}>
             Entrar

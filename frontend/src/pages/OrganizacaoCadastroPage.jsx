@@ -71,7 +71,6 @@ export default function OrganizacaoCadastroPage() {
             onChange={setField("nome")}
             required
             fullWidth
-            InputLabelProps={{ required: false }}
           />
           <TextField
             label="Razão Social da Associação"
@@ -79,7 +78,6 @@ export default function OrganizacaoCadastroPage() {
             onChange={setField("razao_social")}
             required
             fullWidth
-            InputLabelProps={{ required: false }}
           />
           <TextField
             label="CNPJ"
@@ -87,7 +85,6 @@ export default function OrganizacaoCadastroPage() {
             onChange={setField("cnpj")}
             required
             fullWidth
-            InputLabelProps={{ required: false }}
           />
           <TextField
             select
@@ -96,7 +93,6 @@ export default function OrganizacaoCadastroPage() {
             onChange={setField("exclusivamente_agricultura_familiar")}
             required
             fullWidth
-            InputLabelProps={{ required: false }}
           >
             <MenuItem value="sim">Sim</MenuItem>
             <MenuItem value="nao">Não</MenuItem>
@@ -108,7 +104,6 @@ export default function OrganizacaoCadastroPage() {
             onChange={setField("password")}
             required
             fullWidth
-            InputLabelProps={{ required: false }}
           />
           <Button type="submit" variant="contained" disabled={loading}>
             Cadastrar

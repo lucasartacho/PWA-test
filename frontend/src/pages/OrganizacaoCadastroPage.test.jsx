@@ -34,14 +34,14 @@ describe("OrganizacaoCadastroPage", () => {
     );
     renderPage();
 
-    await userEvent.type(screen.getByLabelText("Nome da Associação"), "Coop Teste");
-    await userEvent.type(screen.getByLabelText("Razão Social da Associação"), "Coop Teste LTDA");
-    await userEvent.type(screen.getByLabelText("CNPJ"), "12345678000199");
+    await userEvent.type(screen.getByLabelText(/^Nome da Associação/i), "Coop Teste");
+    await userEvent.type(screen.getByLabelText(/^Razão Social da Associação/i), "Coop Teste LTDA");
+    await userEvent.type(screen.getByLabelText(/^CNPJ/i), "12345678000199");
     await userEvent.click(
       screen.getByLabelText(/exclusivamente da agricultura familiar/i)
     );
     await userEvent.click(await screen.findByRole("option", { name: "Sim" }));
-    await userEvent.type(screen.getByLabelText("Definição de senha"), "senha-segura-123");
+    await userEvent.type(screen.getByLabelText(/^Definição de senha/i), "senha-segura-123");
     await userEvent.click(screen.getByRole("button", { name: "Cadastrar" }));
 
     await waitFor(() => expect(screen.getByText("Dashboard Stub")).toBeInTheDocument());
