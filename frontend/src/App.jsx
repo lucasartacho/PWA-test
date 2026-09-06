@@ -4,6 +4,7 @@ import AgricultorPage from "./pages/AgricultorPage.jsx";
 import DebugPage from "./pages/DebugPage.jsx";
 import OrganizacaoLoginPage from "./pages/OrganizacaoLoginPage.jsx";
 import OrganizacaoCadastroPage from "./pages/OrganizacaoCadastroPage.jsx";
+import OrganizacaoDashboardPage from "./pages/OrganizacaoDashboardPage.jsx";
 import RequireOrgAuth from "./auth/RequireOrgAuth.jsx";
 import OrgLayout from "./auth/OrgLayout.jsx";
 
@@ -20,7 +21,7 @@ export default function App() {
           </RequireOrgAuth>
         }
       >
-        <Route path="/organizacao/dashboard" element={<div>Dashboard em construção</div>} />
+        <Route path="/organizacao/dashboard" element={<OrganizacaoDashboardPage />} />
       </Route>
       <Route path="/agricultor" element={<AgricultorPage />} />
       <Route path="/debug" element={<DebugPage />} />
