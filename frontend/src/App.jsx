@@ -6,6 +6,7 @@ import OrganizacaoLoginPage from "./pages/OrganizacaoLoginPage.jsx";
 import OrganizacaoCadastroPage from "./pages/OrganizacaoCadastroPage.jsx";
 import OrganizacaoDashboardPage from "./pages/OrganizacaoDashboardPage.jsx";
 import AgricultorFormPage from "./pages/AgricultorFormPage.jsx";
+import OrganizacaoPerfilPage from "./pages/OrganizacaoPerfilPage.jsx";
 import RequireOrgAuth from "./auth/RequireOrgAuth.jsx";
 import OrgLayout from "./auth/OrgLayout.jsx";
 
@@ -25,6 +26,7 @@ export default function App() {
         <Route path="/organizacao/dashboard" element={<OrganizacaoDashboardPage />} />
         <Route path="/organizacao/agricultores/novo" element={<AgricultorFormPage />} />
         <Route path="/organizacao/agricultores/:id/editar" element={<AgricultorFormPage />} />
+        <Route path="/organizacao/perfil" element={<OrganizacaoPerfilPage />} />
       </Route>
       <Route path="/agricultor" element={<AgricultorPage />} />
       <Route path="/debug" element={<DebugPage />} />
