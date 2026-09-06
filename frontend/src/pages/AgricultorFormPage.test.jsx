@@ -64,4 +64,15 @@ describe("AgricultorFormPage", () => {
     );
     expect(screen.getByRole("button", { name: "Salvar" })).toBeInTheDocument();
   });
+
+  it("mostra um erro quando falha ao carregar o agricultor no modo edição", async () => {
+    vi.spyOn(organizacaoApi, "obterAgricultor").mockRejectedValue(
+      new Error("Agricultor não encontrado")
+    );
+    renderForm("/organizacao/agricultores/1/editar", "/organizacao/agricultores/:id/editar");
+
+    await waitFor(() =>
+      expect(screen.getByText("Agricultor não encontrado")).toBeInTheDocument()
+    );
+  });
 });

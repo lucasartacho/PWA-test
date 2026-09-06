@@ -35,16 +35,18 @@ export default function AgricultorFormPage() {
 
   useEffect(() => {
     if (!isEdicao) return;
-    obterAgricultor(id).then((dados) =>
-      setForm({
-        nome: dados.nome,
-        cpf: dados.cpf,
-        associado_ou_cooperado: dados.associado_ou_cooperado ? "sim" : "nao",
-        agricultor_familiar: dados.agricultor_familiar ? "sim" : "nao",
-        tem_saf: dados.tem_saf ? "sim" : "nao",
-        usa_agrotoxico: dados.usa_agrotoxico ? "sim" : "nao",
-      })
-    );
+    obterAgricultor(id)
+      .then((dados) =>
+        setForm({
+          nome: dados.nome,
+          cpf: dados.cpf,
+          associado_ou_cooperado: dados.associado_ou_cooperado ? "sim" : "nao",
+          agricultor_familiar: dados.agricultor_familiar ? "sim" : "nao",
+          tem_saf: dados.tem_saf ? "sim" : "nao",
+          usa_agrotoxico: dados.usa_agrotoxico ? "sim" : "nao",
+        })
+      )
+      .catch((err) => setError(err.message));
   }, [id, isEdicao]);
 
   function setField(field) {
