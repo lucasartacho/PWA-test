@@ -41,6 +41,17 @@ describe("AuthContext", () => {
     expect(stored.access).toBe("a");
   });
 
+  it("resolve para deslogado quando a leitura da sessão falha", async () => {
+    vi.spyOn(db.session, "get").mockRejectedValueOnce(new Error("falha no Dexie"));
+    render(
+      <AuthProvider>
+        <Probe />
+      </AuthProvider>
+    );
+    await waitFor(() => expect(screen.getByText("deslogado")).toBeInTheDocument());
+    vi.restoreAllMocks();
+  });
+
   it("logout limpa a sessão do Dexie", async () => {
     await db.session.put({ id: "current", access: "a", refresh: "b" });
     render(

@@ -1,9 +1,30 @@
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
 from .models import Organizacao
+
+
+class OrganizacaoModelValidationTests(TestCase):
+    def test_cnpj_invalido_falha_no_full_clean(self):
+        org = Organizacao(
+            cnpj="abc123",
+            nome="Coop Teste",
+            razao_social="Cooperativa Teste LTDA",
+        )
+        with self.assertRaises(ValidationError):
+            org.full_clean()
+
+    def test_cnpj_com_tamanho_incorreto_falha_no_full_clean(self):
+        org = Organizacao(
+            cnpj="123456789",
+            nome="Coop Teste",
+            razao_social="Cooperativa Teste LTDA",
+        )
+        with self.assertRaises(ValidationError):
+            org.full_clean()
 
 
 class OrganizacaoManagerTests(TestCase):

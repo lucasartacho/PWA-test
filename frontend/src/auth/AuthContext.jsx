@@ -8,7 +8,10 @@ export function AuthProvider({ children }) {
   const [session, setSession] = useState(undefined);
 
   useEffect(() => {
-    db.session.get(SESSION_ID).then((stored) => setSession(stored ?? null));
+    db.session
+      .get(SESSION_ID)
+      .then((stored) => setSession(stored ?? null))
+      .catch(() => setSession(null));
   }, []);
 
   const login = useCallback(async ({ access, refresh }) => {

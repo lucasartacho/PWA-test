@@ -1,4 +1,4 @@
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate, Link as RouterLink } from "react-router-dom";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
@@ -19,9 +19,14 @@ export default function OrgLayout() {
       <AppBar position="static">
         <Toolbar sx={{ justifyContent: "space-between" }}>
           <Typography variant="h6">Protocolo de Benefícios dos SAFs</Typography>
-          <Button color="inherit" onClick={handleLogout}>
-            Sair
-          </Button>
+          <div>
+            <Button color="inherit" component={RouterLink} to="/organizacao/perfil">
+              Perfil
+            </Button>
+            <Button color="inherit" onClick={handleLogout}>
+              Sair
+            </Button>
+          </div>
         </Toolbar>
       </AppBar>
       <Outlet />

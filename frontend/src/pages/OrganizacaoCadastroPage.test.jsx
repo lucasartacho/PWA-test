@@ -46,4 +46,35 @@ describe("OrganizacaoCadastroPage", () => {
 
     await waitFor(() => expect(screen.getByText("Dashboard Stub")).toBeInTheDocument());
   });
+
+  it("mostra os erros de todos os campos retornados pelo backend, não só um", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            cnpj: ["CNPJ deve conter exatamente 14 dígitos numéricos."],
+            password: ["Ensure this field has at least 8 characters."],
+          }),
+          { status: 400 }
+        )
+      )
+    );
+    renderPage();
+
+    await userEvent.type(screen.getByLabelText(/^Nome da Associação/i), "Coop Teste");
+    await userEvent.type(screen.getByLabelText(/^Razão Social da Associação/i), "Coop Teste LTDA");
+    await userEvent.type(screen.getByLabelText(/^CNPJ/i), "123");
+    await userEvent.click(
+      screen.getByLabelText(/exclusivamente da agricultura familiar/i)
+    );
+    await userEvent.click(await screen.findByRole("option", { name: "Sim" }));
+    await userEvent.type(screen.getByLabelText(/^Definição de senha/i), "senha-com-oito-ou-mais");
+    await userEvent.click(screen.getByRole("button", { name: "Cadastrar" }));
+
+    await waitFor(() => expect(screen.getByRole("alert")).toBeInTheDocument());
+    const alertText = screen.getByRole("alert").textContent;
+    expect(alertText).toContain("CNPJ deve conter exatamente 14 dígitos numéricos.");
+    expect(alertText).toContain("Ensure this field has at least 8 characters.");
+  });
 });

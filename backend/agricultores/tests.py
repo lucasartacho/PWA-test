@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
@@ -32,6 +33,36 @@ class AgricultorModelTests(TestCase):
             Agricultor.objects.create(
                 organizacao=self.organizacao, nome="Outra", cpf="12345678900"
             )
+
+    def test_mesmo_cpf_em_organizacoes_diferentes_e_permitido(self):
+        outra_organizacao = Organizacao.objects.create_user(
+            cnpj="98765432000198",
+            nome="Coop Dois",
+            razao_social="Cooperativa Dois LTDA",
+            password="senha-segura-123",
+        )
+        Agricultor.objects.create(
+            organizacao=self.organizacao, nome="Maria", cpf="12345678900"
+        )
+        agricultor_outra_org = Agricultor.objects.create(
+            organizacao=outra_organizacao, nome="Maria (outra coop)", cpf="12345678900"
+        )
+        self.assertEqual(agricultor_outra_org.cpf, "12345678900")
+        self.assertEqual(agricultor_outra_org.organizacao, outra_organizacao)
+
+    def test_cpf_invalido_falha_no_full_clean(self):
+        agricultor = Agricultor(
+            organizacao=self.organizacao, nome="Maria", cpf="abc"
+        )
+        with self.assertRaises(ValidationError):
+            agricultor.full_clean()
+
+    def test_cpf_com_tamanho_incorreto_falha_no_full_clean(self):
+        agricultor = Agricultor(
+            organizacao=self.organizacao, nome="Maria", cpf="123456789"
+        )
+        with self.assertRaises(ValidationError):
+            agricultor.full_clean()
 
 
 class AgricultorAPITests(APITestCase):

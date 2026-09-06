@@ -1,5 +1,10 @@
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
 
+export function extractErrorMessage(data, fallback) {
+  const messages = Object.values(data ?? {}).flat().filter((m) => typeof m === "string");
+  return messages.length > 0 ? messages.join(" ") : fallback;
+}
+
 export async function checkHealth() {
   const response = await fetch(`${API_URL}/api/health/`);
   if (!response.ok) {
@@ -28,7 +33,7 @@ export async function cadastrarOrganizacao(dados) {
   });
   if (!response.ok) {
     const data = await response.json().catch(() => ({}));
-    throw new Error(data.cnpj?.[0] || "Não foi possível cadastrar a organização");
+    throw new Error(extractErrorMessage(data, "Não foi possível cadastrar a organização"));
   }
   return response.json();
 }

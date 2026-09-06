@@ -1,4 +1,5 @@
 import { authFetch } from "./authFetch.js";
+import { extractErrorMessage } from "../api.js";
 
 export async function getPerfil() {
   const response = await authFetch("/api/organizacoes/me/");
@@ -35,7 +36,7 @@ export async function cadastrarAgricultor(dados) {
   });
   if (!response.ok) {
     const data = await response.json().catch(() => ({}));
-    throw new Error(data.cpf?.[0] || "Não foi possível cadastrar o(a) agricultor(a)");
+    throw new Error(extractErrorMessage(data, "Não foi possível cadastrar o(a) agricultor(a)"));
   }
   return response.json();
 }

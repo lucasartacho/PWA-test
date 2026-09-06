@@ -47,6 +47,7 @@ export default function OrganizacaoLoginPage() {
             onChange={(e) => setCnpj(e.target.value)}
             required
             fullWidth
+            inputMode="numeric"
           />
           <TextField
             label="Senha"

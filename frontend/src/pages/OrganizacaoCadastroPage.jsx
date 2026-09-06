@@ -85,6 +85,7 @@ export default function OrganizacaoCadastroPage() {
             onChange={setField("cnpj")}
             required
             fullWidth
+            inputMode="numeric"
           />
           <TextField
             select
@@ -104,6 +105,7 @@ export default function OrganizacaoCadastroPage() {
             onChange={setField("password")}
             required
             fullWidth
+            minLength={8}
           />
           <Button type="submit" variant="contained" disabled={loading}>
             Cadastrar

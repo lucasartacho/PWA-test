@@ -94,6 +94,7 @@ export default function AgricultorFormPage() {
             onChange={setField("cpf")}
             required
             fullWidth
+            inputMode="numeric"
           />
           {CAMPOS_SIM_NAO.map(([campo, rotulo]) => (
             <TextField
