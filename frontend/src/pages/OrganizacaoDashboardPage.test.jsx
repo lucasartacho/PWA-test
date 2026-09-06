@@ -43,4 +43,18 @@ describe("OrganizacaoDashboardPage", () => {
     );
     expect(organizacaoApi.excluirAgricultor).toHaveBeenCalledWith(1);
   });
+
+  it("shows an error message when the initial fetch fails", async () => {
+    vi.spyOn(organizacaoApi, "listarAgricultores").mockRejectedValue(new Error("Falha ao buscar agricultores"));
+
+    render(
+      <MemoryRouter>
+        <OrganizacaoDashboardPage />
+      </MemoryRouter>
+    );
+
+    await waitFor(() =>
+      expect(screen.getByText("Falha ao buscar agricultores")).toBeInTheDocument()
+    );
+  });
 });
