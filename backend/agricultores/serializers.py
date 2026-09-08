@@ -4,10 +4,13 @@ from .models import Agricultor
 
 
 class AgricultorSerializer(serializers.ModelSerializer):
+    organizacao = serializers.HiddenField(default=serializers.CurrentUserDefault())
+
     class Meta:
         model = Agricultor
         fields = [
             "id",
+            "organizacao",
             "nome",
             "cpf",
             "associado_ou_cooperado",

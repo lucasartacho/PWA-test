@@ -33,8 +33,12 @@ export default function OrganizacaoDashboardPage() {
   }, []);
 
   async function handleDelete(id) {
-    await excluirAgricultor(id);
-    load();
+    try {
+      await excluirAgricultor(id);
+      load();
+    } catch (err) {
+      setError(err.message);
+    }
   }
 
   if (agricultores === null && !error) {

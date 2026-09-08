@@ -44,6 +44,30 @@ describe("OrganizacaoDashboardPage", () => {
     expect(organizacaoApi.excluirAgricultor).toHaveBeenCalledWith(1);
   });
 
+  it("shows an error message when delete fails, without removing the row", async () => {
+    vi.spyOn(organizacaoApi, "listarAgricultores").mockResolvedValue([
+      { id: 1, nome: "Maria Agricultora" },
+    ]);
+    vi.spyOn(organizacaoApi, "excluirAgricultor").mockRejectedValue(
+      new Error("Não foi possível excluir o(a) agricultor(a)")
+    );
+
+    render(
+      <MemoryRouter>
+        <OrganizacaoDashboardPage />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => expect(screen.getByText("Maria Agricultora")).toBeInTheDocument());
+
+    await userEvent.click(screen.getByLabelText("Excluir Maria Agricultora"));
+
+    await waitFor(() =>
+      expect(screen.getByText("Não foi possível excluir o(a) agricultor(a)")).toBeInTheDocument()
+    );
+    expect(screen.getByText("Maria Agricultora")).toBeInTheDocument();
+  });
+
   it("shows an error message when the initial fetch fails", async () => {
     vi.spyOn(organizacaoApi, "listarAgricultores").mockRejectedValue(new Error("Falha ao buscar agricultores"));
 

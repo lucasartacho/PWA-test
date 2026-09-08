@@ -104,3 +104,11 @@ class AgricultorAPITests(APITestCase):
         url = reverse("agricultor-detail", args=[self.agricultor_a.id])
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_cpf_duplicado_na_mesma_organizacao_retorna_400_nao_500(self):
+        self.client.force_authenticate(user=self.org_a)
+        payload = {"nome": "Outro Agricultor", "cpf": self.agricultor_a.cpf}
+        response = self.client.post(
+            reverse("agricultor-list-create"), payload, format="json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

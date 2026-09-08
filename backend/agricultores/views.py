@@ -11,9 +11,6 @@ class AgricultorListCreateView(generics.ListCreateAPIView):
     def get_queryset(self):
         return Agricultor.objects.filter(organizacao=self.request.user)
 
-    def perform_create(self, serializer):
-        serializer.save(organizacao=self.request.user)
-
 
 class AgricultorDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = AgricultorSerializer

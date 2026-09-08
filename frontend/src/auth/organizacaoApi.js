@@ -1,5 +1,5 @@
 import { authFetch } from "./authFetch.js";
-import { extractErrorMessage } from "../api.js";
+import { ApiValidationError } from "../api.js";
 
 export async function getPerfil() {
   const response = await authFetch("/api/organizacoes/me/");
@@ -12,7 +12,10 @@ export async function atualizarPerfil(dados) {
     method: "PATCH",
     body: JSON.stringify(dados),
   });
-  if (!response.ok) throw new Error("Não foi possível atualizar o perfil");
+  if (!response.ok) {
+    const data = await response.json().catch(() => ({}));
+    throw new ApiValidationError(data, "Não foi possível atualizar o perfil");
+  }
   return response.json();
 }
 
@@ -36,7 +39,7 @@ export async function cadastrarAgricultor(dados) {
   });
   if (!response.ok) {
     const data = await response.json().catch(() => ({}));
-    throw new Error(extractErrorMessage(data, "Não foi possível cadastrar o(a) agricultor(a)"));
+    throw new ApiValidationError(data, "Não foi possível cadastrar o(a) agricultor(a)");
   }
   return response.json();
 }
@@ -52,7 +55,10 @@ export async function atualizarAgricultor(id, dados) {
     method: "PATCH",
     body: JSON.stringify(dados),
   });
-  if (!response.ok) throw new Error("Não foi possível atualizar o(a) agricultor(a)");
+  if (!response.ok) {
+    const data = await response.json().catch(() => ({}));
+    throw new ApiValidationError(data, "Não foi possível atualizar o(a) agricultor(a)");
+  }
   return response.json();
 }
 

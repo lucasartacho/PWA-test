@@ -8,6 +8,8 @@ import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
 import Alert from "@mui/material/Alert";
 import { cadastrarAgricultor, obterAgricultor, atualizarAgricultor } from "../auth/organizacaoApi.js";
+import { ApiValidationError } from "../api.js";
+import { formatCPF, onlyDigits } from "../format.js";
 
 const CAMPOS_SIM_NAO = [
   ["associado_ou_cooperado", "O(A) agricultor(a) é associado ou cooperado?"],
@@ -30,6 +32,7 @@ export default function AgricultorFormPage() {
   const isEdicao = Boolean(id);
   const [form, setForm] = useState(FORM_VAZIO);
   const [error, setError] = useState(null);
+  const [fieldErrors, setFieldErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -39,7 +42,7 @@ export default function AgricultorFormPage() {
       .then((dados) =>
         setForm({
           nome: dados.nome,
-          cpf: dados.cpf,
+          cpf: formatCPF(dados.cpf),
           associado_ou_cooperado: dados.associado_ou_cooperado ? "sim" : "nao",
           agricultor_familiar: dados.agricultor_familiar ? "sim" : "nao",
           tem_saf: dados.tem_saf ? "sim" : "nao",
@@ -53,13 +56,18 @@ export default function AgricultorFormPage() {
     return (event) => setForm((prev) => ({ ...prev, [field]: event.target.value }));
   }
 
+  function setCpfField(event) {
+    setForm((prev) => ({ ...prev, cpf: formatCPF(event.target.value) }));
+  }
+
   async function handleSubmit(event) {
     event.preventDefault();
     setError(null);
+    setFieldErrors({});
     setLoading(true);
     const payload = {
       nome: form.nome,
-      cpf: form.cpf,
+      cpf: onlyDigits(form.cpf),
       associado_ou_cooperado: form.associado_ou_cooperado === "sim",
       agricultor_familiar: form.agricultor_familiar === "sim",
       tem_saf: form.tem_saf === "sim",
@@ -74,9 +82,17 @@ export default function AgricultorFormPage() {
       navigate("/organizacao/dashboard");
     } catch (err) {
       setError(err.message);
+      if (err instanceof ApiValidationError) {
+        setFieldErrors(err.fields);
+      }
     } finally {
       setLoading(false);
     }
+  }
+
+  function fieldProps(field) {
+    const message = fieldErrors[field]?.[0];
+    return message ? { error: true, helperText: message } : {};
   }
 
   return (
@@ -87,14 +103,22 @@ export default function AgricultorFormPage() {
       <form onSubmit={handleSubmit}>
         <Stack spacing={2}>
           {error && <Alert severity="error">{error}</Alert>}
-          <TextField label="Nome do(a) Agricultor(a)" value={form.nome} onChange={setField("nome")} required fullWidth />
+          <TextField
+            label="Nome do(a) Agricultor(a)"
+            value={form.nome}
+            onChange={setField("nome")}
+            required
+            fullWidth
+            {...fieldProps("nome")}
+          />
           <TextField
             label="CPF do(a) agricultor(a)"
             value={form.cpf}
-            onChange={setField("cpf")}
+            onChange={setCpfField}
             required
             fullWidth
             inputMode="numeric"
+            {...fieldProps("cpf")}
           />
           {CAMPOS_SIM_NAO.map(([campo, rotulo]) => (
             <TextField

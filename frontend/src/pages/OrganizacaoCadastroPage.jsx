@@ -7,7 +7,12 @@ import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
 import Alert from "@mui/material/Alert";
 import MenuItem from "@mui/material/MenuItem";
-import { cadastrarOrganizacao, loginOrganizacao } from "../api.js";
+import IconButton from "@mui/material/IconButton";
+import InputAdornment from "@mui/material/InputAdornment";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import { cadastrarOrganizacao, loginOrganizacao, ApiValidationError } from "../api.js";
+import { formatCNPJ, onlyDigits } from "../format.js";
 import { useAuth } from "../auth/AuthContext.jsx";
 
 export default function OrganizacaoCadastroPage() {
@@ -19,6 +24,8 @@ export default function OrganizacaoCadastroPage() {
     password: "",
   });
   const [error, setError] = useState(null);
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -27,26 +34,42 @@ export default function OrganizacaoCadastroPage() {
     return (event) => setForm((prev) => ({ ...prev, [field]: event.target.value }));
   }
 
+  function setCnpjField(event) {
+    setForm((prev) => ({ ...prev, cnpj: formatCNPJ(event.target.value) }));
+  }
+
   async function handleSubmit(event) {
     event.preventDefault();
     setError(null);
+    setFieldErrors({});
     setLoading(true);
     try {
       await cadastrarOrganizacao({
         nome: form.nome,
         razao_social: form.razao_social,
-        cnpj: form.cnpj,
+        cnpj: onlyDigits(form.cnpj),
         exclusivamente_agricultura_familiar: form.exclusivamente_agricultura_familiar === "sim",
         password: form.password,
       });
-      const tokens = await loginOrganizacao({ cnpj: form.cnpj, password: form.password });
+      const tokens = await loginOrganizacao({
+        cnpj: onlyDigits(form.cnpj),
+        password: form.password,
+      });
       await login(tokens);
       navigate("/organizacao/dashboard");
     } catch (err) {
       setError(err.message);
+      if (err instanceof ApiValidationError) {
+        setFieldErrors(err.fields);
+      }
     } finally {
       setLoading(false);
     }
+  }
+
+  function fieldProps(field) {
+    const message = fieldErrors[field]?.[0];
+    return message ? { error: true, helperText: message } : {};
   }
 
   return (
@@ -71,6 +94,7 @@ export default function OrganizacaoCadastroPage() {
             onChange={setField("nome")}
             required
             fullWidth
+            {...fieldProps("nome")}
           />
           <TextField
             label="Razão Social da Associação"
@@ -78,14 +102,16 @@ export default function OrganizacaoCadastroPage() {
             onChange={setField("razao_social")}
             required
             fullWidth
+            {...fieldProps("razao_social")}
           />
           <TextField
             label="CNPJ"
             value={form.cnpj}
-            onChange={setField("cnpj")}
+            onChange={setCnpjField}
             required
             fullWidth
             inputMode="numeric"
+            {...fieldProps("cnpj")}
           />
           <TextField
             select
@@ -100,12 +126,26 @@ export default function OrganizacaoCadastroPage() {
           </TextField>
           <TextField
             label="Definição de senha"
-            type="password"
+            type={showPassword ? "text" : "password"}
             value={form.password}
             onChange={setField("password")}
             required
             fullWidth
             minLength={8}
+            {...fieldProps("password")}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    edge="end"
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
           />
           <Button type="submit" variant="contained" disabled={loading}>
             Cadastrar

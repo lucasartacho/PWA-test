@@ -5,6 +5,14 @@ export function extractErrorMessage(data, fallback) {
   return messages.length > 0 ? messages.join(" ") : fallback;
 }
 
+export class ApiValidationError extends Error {
+  constructor(fields, fallback) {
+    super(extractErrorMessage(fields, fallback));
+    this.name = "ApiValidationError";
+    this.fields = fields ?? {};
+  }
+}
+
 export async function checkHealth() {
   const response = await fetch(`${API_URL}/api/health/`);
   if (!response.ok) {
@@ -33,7 +41,7 @@ export async function cadastrarOrganizacao(dados) {
   });
   if (!response.ok) {
     const data = await response.json().catch(() => ({}));
-    throw new Error(extractErrorMessage(data, "Não foi possível cadastrar a organização"));
+    throw new ApiValidationError(data, "Não foi possível cadastrar a organização");
   }
   return response.json();
 }

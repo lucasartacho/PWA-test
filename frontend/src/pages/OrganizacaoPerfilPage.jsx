@@ -11,11 +11,13 @@ import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogActions from "@mui/material/DialogActions";
 import { getPerfil, atualizarPerfil, excluirPerfil } from "../auth/organizacaoApi.js";
+import { ApiValidationError } from "../api.js";
 import { useAuth } from "../auth/AuthContext.jsx";
 
 export default function OrganizacaoPerfilPage() {
   const [form, setForm] = useState(null);
   const [error, setError] = useState(null);
+  const [fieldErrors, setFieldErrors] = useState({});
   const [confirmandoExclusao, setConfirmandoExclusao] = useState(false);
   const { logout } = useAuth();
   const navigate = useNavigate();
@@ -39,6 +41,7 @@ export default function OrganizacaoPerfilPage() {
   async function handleSubmit(event) {
     event.preventDefault();
     setError(null);
+    setFieldErrors({});
     try {
       await atualizarPerfil({
         nome: form.nome,
@@ -47,7 +50,15 @@ export default function OrganizacaoPerfilPage() {
       });
     } catch (err) {
       setError(err.message);
+      if (err instanceof ApiValidationError) {
+        setFieldErrors(err.fields);
+      }
     }
+  }
+
+  function fieldProps(field) {
+    const message = fieldErrors[field]?.[0];
+    return message ? { error: true, helperText: message } : {};
   }
 
   async function handleExcluir() {
@@ -77,8 +88,20 @@ export default function OrganizacaoPerfilPage() {
       <form onSubmit={handleSubmit}>
         <Stack spacing={2}>
           {error && <Alert severity="error">{error}</Alert>}
-          <TextField label="Nome da Associação" value={form.nome} onChange={setField("nome")} fullWidth />
-          <TextField label="Razão Social" value={form.razao_social} onChange={setField("razao_social")} fullWidth />
+          <TextField
+            label="Nome da Associação"
+            value={form.nome}
+            onChange={setField("nome")}
+            fullWidth
+            {...fieldProps("nome")}
+          />
+          <TextField
+            label="Razão Social"
+            value={form.razao_social}
+            onChange={setField("razao_social")}
+            fullWidth
+            {...fieldProps("razao_social")}
+          />
           <TextField
             select
             label="Exclusivamente da agricultura familiar?"

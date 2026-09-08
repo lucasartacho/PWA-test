@@ -367,21 +367,9 @@ class OrganizacaoCadastroSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         password = validated_data.pop("password")
         return Organizacao.objects.create_user(password=password, **validated_data)
-
-
-class OrganizacaoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Organizacao
-        fields = [
-            "id",
-            "cnpj",
-            "nome",
-            "razao_social",
-            "exclusivamente_agricultura_familiar",
-            "created_at",
-        ]
-        read_only_fields = ["id", "cnpj", "created_at"]
 ```
+
+(Task 5 adds a second serializer, `OrganizacaoSerializer`, to this same file for the "me" endpoint — not created here, to keep this task's code and its own tests in the same task.)
 
 - [ ] **Step 3: Create `backend/organizacoes/views.py`**
 
@@ -389,37 +377,30 @@ class OrganizacaoSerializer(serializers.ModelSerializer):
 from rest_framework import generics, permissions
 
 from .models import Organizacao
-from .serializers import OrganizacaoCadastroSerializer, OrganizacaoSerializer
+from .serializers import OrganizacaoCadastroSerializer
 
 
 class OrganizacaoCadastroView(generics.CreateAPIView):
     queryset = Organizacao.objects.all()
     serializer_class = OrganizacaoCadastroSerializer
     permission_classes = [permissions.AllowAny]
-
-
-class OrganizacaoMeView(generics.RetrieveUpdateDestroyAPIView):
-    serializer_class = OrganizacaoSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get_object(self):
-        return self.request.user
 ```
 
-(`OrganizacaoMeView` is wired here so Task 5 only has to add its tests — the view is trivial and belongs next to its sibling.)
+(Task 5 adds `OrganizacaoMeView` to this same file.)
 
 - [ ] **Step 4: Create `backend/organizacoes/urls.py`**
 
 ```python
 from django.urls import path
 
-from .views import OrganizacaoCadastroView, OrganizacaoMeView
+from .views import OrganizacaoCadastroView
 
 urlpatterns = [
     path("", OrganizacaoCadastroView.as_view(), name="organizacao-cadastro"),
-    path("me/", OrganizacaoMeView.as_view(), name="organizacao-me"),
 ]
 ```
+
+(Task 5 adds the `me/` path to this same file.)
 
 - [ ] **Step 5: Wire it in `backend/app/urls.py`**
 
@@ -535,10 +516,13 @@ git commit -m "feat: add JWT login and refresh endpoints"
 
 **Files:**
 - Modify: `backend/organizacoes/tests.py`
+- Modify: `backend/organizacoes/serializers.py`
+- Modify: `backend/organizacoes/views.py`
+- Modify: `backend/organizacoes/urls.py`
 
 **Interfaces:**
-- Consumes: `OrganizacaoMeView` (already created in Task 3).
-- Produces: `GET/PATCH/DELETE /api/organizacoes/me/` behavior verified. Consumed by the frontend's `getPerfil()`/`atualizarPerfil()`/`excluirPerfil()` in Task 7.
+- Consumes: `Organizacao` model (Task 1).
+- Produces: `GET/PATCH/DELETE /api/organizacoes/me/`. Consumed by the frontend's `getPerfil()`/`atualizarPerfil()`/`excluirPerfil()` in Task 7.
 
 - [ ] **Step 1: Append the failing tests to `backend/organizacoes/tests.py`**
 
@@ -577,19 +561,65 @@ class OrganizacaoMeAPITests(APITestCase):
         self.assertFalse(Organizacao.objects.filter(cnpj="12345678000199").exists())
 ```
 
-- [ ] **Step 2: Run the tests**
+- [ ] **Step 2: Add `OrganizacaoSerializer` to `backend/organizacoes/serializers.py`**
+
+Append below the existing `OrganizacaoCadastroSerializer`:
+
+```python
+class OrganizacaoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Organizacao
+        fields = [
+            "id",
+            "cnpj",
+            "nome",
+            "razao_social",
+            "exclusivamente_agricultura_familiar",
+            "created_at",
+        ]
+        read_only_fields = ["id", "cnpj", "created_at"]
+```
+
+- [ ] **Step 3: Add `OrganizacaoMeView` to `backend/organizacoes/views.py`**
+
+Update the import line to include the new serializer, and append the view:
+
+```python
+from .serializers import OrganizacaoCadastroSerializer, OrganizacaoSerializer
+
+
+class OrganizacaoMeView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = OrganizacaoSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
+```
+
+- [ ] **Step 4: Add the `me/` path to `backend/organizacoes/urls.py`**
+
+```python
+from .views import OrganizacaoCadastroView, OrganizacaoMeView
+
+urlpatterns = [
+    path("", OrganizacaoCadastroView.as_view(), name="organizacao-cadastro"),
+    path("me/", OrganizacaoMeView.as_view(), name="organizacao-me"),
+]
+```
+
+- [ ] **Step 5: Run the tests**
 
 ```bash
 docker compose run --rm backend python manage.py test organizacoes
 ```
 
-Expected: `OK` (9 tests). No implementation changes needed — `OrganizacaoMeView` was already built in Task 3; this task exists to prove its full contract with tests.
+Expected: `OK` (9 tests).
 
-- [ ] **Step 3: Commit**
+- [ ] **Step 6: Commit**
 
 ```bash
-git add backend/organizacoes/tests.py
-git commit -m "test: cover organizacao profile CRUD"
+git add backend/organizacoes
+git commit -m "feat: add organizacao profile CRUD endpoint"
 ```
 
 ---
@@ -609,12 +639,14 @@ git commit -m "test: cover organizacao profile CRUD"
 
 - [ ] **Step 1: Append the failing tests to `backend/agricultores/tests.py`**
 
+Add `from django.urls import reverse`, `from rest_framework import status`, and
+`from rest_framework.test import APITestCase` to the **top** of the file
+alongside the existing imports (not inline before the new class) — Python
+doesn't require it, but it keeps the file's import block in one place, matching
+the existing style. Then append the new class at the bottom, below
+`AgricultorModelTests`:
+
 ```python
-from django.urls import reverse
-from rest_framework import status
-from rest_framework.test import APITestCase
-
-
 class AgricultorAPITests(APITestCase):
     def setUp(self):
         self.org_a = Organizacao.objects.create_user(
