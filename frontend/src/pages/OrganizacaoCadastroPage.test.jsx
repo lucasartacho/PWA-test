@@ -23,6 +23,10 @@ describe("OrganizacaoCadastroPage", () => {
   });
 
   it("cadastra e loga a organização, navegando pro dashboard", async () => {
+    // Heaviest test in the suite (multi-field form + MUI select + two sequential
+    // mocked fetches). Under Docker CPU contention with the full suite running in
+    // parallel workers, this can take 6-7s even though it's not actually broken —
+    // see frontend/flaky-test-investigation.md for measurements.
     vi.stubGlobal(
       "fetch",
       vi
@@ -45,7 +49,7 @@ describe("OrganizacaoCadastroPage", () => {
     await userEvent.click(screen.getByRole("button", { name: "Cadastrar" }));
 
     await waitFor(() => expect(screen.getByText("Dashboard Stub")).toBeInTheDocument());
-  });
+  }, 10000);
 
   it("mostra os erros de todos os campos retornados pelo backend, não só um", async () => {
     vi.stubGlobal(

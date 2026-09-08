@@ -21,6 +21,10 @@ describe("AgricultorFormPage", () => {
   });
 
   it("cadastra um novo agricultor e navega pro dashboard", async () => {
+    // Heaviest test in the suite (four sequential MUI select interactions via
+    // userEvent). Under Docker CPU contention with the full suite running in
+    // parallel workers, this can take 6-7s even though it's not actually broken —
+    // see frontend/flaky-test-investigation.md for measurements.
     vi.spyOn(organizacaoApi, "cadastrarAgricultor").mockResolvedValue({ id: 1 });
     renderForm("/organizacao/agricultores/novo", "/organizacao/agricultores/novo");
 
@@ -46,7 +50,7 @@ describe("AgricultorFormPage", () => {
       tem_saf: true,
       usa_agrotoxico: true,
     });
-  });
+  }, 10000);
 
   it("carrega os dados existentes no modo edição", async () => {
     vi.spyOn(organizacaoApi, "obterAgricultor").mockResolvedValue({
