@@ -8,6 +8,7 @@ from agricultores.models import Agricultor
 from organizacoes.models import Organizacao
 
 from .models import SelosSelecionados
+from .tokens import gerar_token
 
 
 class SelosSelecionadosModelTests(TestCase):
@@ -53,3 +54,41 @@ class AgricultorLoginAPITests(APITestCase):
         url = reverse("agricultor-login")
         response = self.client.post(url, {"cpf": "abc"}, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+class AgricultorMeAndSelosAPITests(APITestCase):
+    def setUp(self):
+        self.organizacao = Organizacao.objects.create_user(
+            cnpj="12345678000199",
+            nome="Coop Teste",
+            razao_social="Cooperativa Teste LTDA",
+            password="senha-segura-123",
+        )
+        Agricultor.objects.create(
+            organizacao=self.organizacao, nome="Maria Agricultora", cpf="12345678900"
+        )
+        self.token = gerar_token("12345678900")
+
+    def auth_headers(self):
+        return {"HTTP_AUTHORIZATION": f"Bearer {self.token}"}
+
+    def test_me_requer_autenticacao(self):
+        response = self.client.get(reverse("agricultor-me"))
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_me_retorna_nome_e_selos_vazios_inicialmente(self):
+        response = self.client.get(reverse("agricultor-me"), **self.auth_headers())
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["nome"], "Maria Agricultora")
+        self.assertEqual(response.data["selos"], [])
+
+    def test_salvar_e_recuperar_selos(self):
+        response = self.client.put(
+            reverse("agricultor-selos"),
+            {"selos": ["policultivo", "solo_vivo"]},
+            format="json",
+            **self.auth_headers(),
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response = self.client.get(reverse("agricultor-me"), **self.auth_headers())
+        self.assertEqual(response.data["selos"], ["policultivo", "solo_vivo"])
