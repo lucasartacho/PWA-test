@@ -16,6 +16,7 @@ INSTALLED_APPS = [
     "health",
     "organizacoes",
     "agricultores",
+    "agricultor_auth",
 ]
 
 MIDDLEWARE = [
