@@ -6,15 +6,18 @@ import CssBaseline from "@mui/material/CssBaseline";
 import App from "./App.jsx";
 import { theme } from "./theme.js";
 import { AuthProvider } from "./auth/AuthContext.jsx";
+import { AgricultorAuthProvider } from "./auth/AgricultorAuthContext.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <AuthProvider>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
+        <AgricultorAuthProvider>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </AgricultorAuthProvider>
       </AuthProvider>
     </ThemeProvider>
   </React.StrictMode>

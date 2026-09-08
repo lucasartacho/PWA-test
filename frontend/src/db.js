@@ -10,3 +10,9 @@ db.version(2).stores({
   diagnostics: "++id, checkedAt",
   session: "&id",
 });
+
+db.version(3).stores({
+  diagnostics: "++id, checkedAt",
+  session: "&id",
+  agricultorSession: "&id",
+});
