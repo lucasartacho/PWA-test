@@ -1,6 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import IndexPage from "./pages/IndexPage.jsx";
-import AgricultorPage from "./pages/AgricultorPage.jsx";
+import AgricultorLoginPage from "./pages/AgricultorLoginPage.jsx";
 import DebugPage from "./pages/DebugPage.jsx";
 import OrganizacaoLoginPage from "./pages/OrganizacaoLoginPage.jsx";
 import OrganizacaoCadastroPage from "./pages/OrganizacaoCadastroPage.jsx";
@@ -28,7 +28,7 @@ export default function App() {
         <Route path="/organizacao/agricultores/:id/editar" element={<AgricultorFormPage />} />
         <Route path="/organizacao/perfil" element={<OrganizacaoPerfilPage />} />
       </Route>
-      <Route path="/agricultor" element={<AgricultorPage />} />
+      <Route path="/agricultor" element={<AgricultorLoginPage />} />
       <Route path="/debug" element={<DebugPage />} />
     </Routes>
   );
