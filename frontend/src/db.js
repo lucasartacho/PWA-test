@@ -16,3 +16,10 @@ db.version(3).stores({
   session: "&id",
   agricultorSession: "&id",
 });
+
+db.version(4).stores({
+  diagnostics: "++id, checkedAt",
+  session: "&id",
+  agricultorSession: "&id",
+  agricultorSelosPendentes: "&id",
+});
