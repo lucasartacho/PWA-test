@@ -8,16 +8,7 @@ import Button from "@mui/material/Button";
 import Alert from "@mui/material/Alert";
 import Stack from "@mui/material/Stack";
 import { getAgricultorMe, salvarSelos } from "../auth/agricultorApi.js";
-
-const SELOS = [
-  ["conserva_natureza", "Conserva a natureza"],
-  ["policultivo", "Policultivo"],
-  ["saberes_no_prato", "Saberes no prato"],
-  ["sem_agrotoxico", "Produzido sem Agrotóxico"],
-  ["solo_vivo", "Solo vivo"],
-  ["cultivando_felicidade", "Cultivando felicidade"],
-  ["boniteza", "Boniteza"],
-];
+import { SELOS } from "../selos.js";
 
 export default function AgricultorProtocoloPage() {
   const [selecionados, setSelecionados] = useState(null);

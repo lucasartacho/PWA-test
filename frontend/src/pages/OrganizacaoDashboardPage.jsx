@@ -14,6 +14,14 @@ import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { listarAgricultores, excluirAgricultor } from "../auth/organizacaoApi.js";
+import { rotuloSelo } from "../selos.js";
+
+function textoProtocolo(agricultor) {
+  if (!agricultor.selos || agricultor.selos.length === 0) {
+    return "Protocolo: Ainda não preenchido";
+  }
+  return `Selos: ${agricultor.selos.map(rotuloSelo).join(", ")}`;
+}
 
 export default function OrganizacaoDashboardPage() {
   const [agricultores, setAgricultores] = useState(null);
@@ -90,7 +98,7 @@ export default function OrganizacaoDashboardPage() {
                     </>
                   }
                 >
-                  <ListItemText primary={agricultor.nome} secondary="Protocolo: Ainda não preenchido" />
+                  <ListItemText primary={agricultor.nome} secondary={textoProtocolo(agricultor)} />
                 </ListItem>
               ))}
             </List>

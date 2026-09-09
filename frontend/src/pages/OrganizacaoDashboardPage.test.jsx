@@ -44,6 +44,22 @@ describe("OrganizacaoDashboardPage", () => {
     expect(organizacaoApi.excluirAgricultor).toHaveBeenCalledWith(1);
   });
 
+  it("shows the selo labels when the agricultor already selected some", async () => {
+    vi.spyOn(organizacaoApi, "listarAgricultores").mockResolvedValue([
+      { id: 1, nome: "Maria Agricultora", selos: ["policultivo", "solo_vivo"] },
+    ]);
+
+    render(
+      <MemoryRouter>
+        <OrganizacaoDashboardPage />
+      </MemoryRouter>
+    );
+
+    await waitFor(() =>
+      expect(screen.getByText("Selos: Policultivo, Solo vivo")).toBeInTheDocument()
+    );
+  });
+
   it("shows an error message when delete fails, without removing the row", async () => {
     vi.spyOn(organizacaoApi, "listarAgricultores").mockResolvedValue([
       { id: 1, nome: "Maria Agricultora" },

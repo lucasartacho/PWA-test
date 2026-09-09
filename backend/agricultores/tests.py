@@ -4,6 +4,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+from agricultor_auth.models import SelosSelecionados
 from organizacoes.models import Organizacao
 
 from .models import Agricultor
@@ -112,3 +113,16 @@ class AgricultorAPITests(APITestCase):
             reverse("agricultor-list-create"), payload, format="json"
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_lista_inclui_selos_vazios_quando_nao_preencheu(self):
+        self.client.force_authenticate(user=self.org_a)
+        response = self.client.get(reverse("agricultor-list-create"))
+        self.assertEqual(response.data[0]["selos"], [])
+
+    def test_lista_inclui_selos_selecionados(self):
+        SelosSelecionados.objects.create(
+            cpf=self.agricultor_a.cpf, selos=["policultivo", "solo_vivo"]
+        )
+        self.client.force_authenticate(user=self.org_a)
+        response = self.client.get(reverse("agricultor-list-create"))
+        self.assertEqual(response.data[0]["selos"], ["policultivo", "solo_vivo"])
