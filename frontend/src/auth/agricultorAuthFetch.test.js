@@ -28,4 +28,14 @@ describe("agricultorAuthFetch", () => {
     await db.agricultorSession.clear();
     await expect(agricultorAuthFetch("/api/agricultor/me/")).rejects.toThrow("Não autenticado");
   });
+
+  it("deletes the session and throws when the token is expired (401)", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response(null, { status: 401 }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(agricultorAuthFetch("/api/agricultor/me/")).rejects.toThrow("Sessão expirada");
+
+    const session = await db.agricultorSession.get("current");
+    expect(session).toBeUndefined();
+  });
 });

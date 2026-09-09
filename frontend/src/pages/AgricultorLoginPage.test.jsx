@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import AgricultorLoginPage from "./AgricultorLoginPage.jsx";
 import { AgricultorAuthProvider } from "../auth/AgricultorAuthContext.jsx";
+import { db } from "../db.js";
 
 function renderPage() {
   return render(
@@ -18,8 +19,9 @@ function renderPage() {
 }
 
 describe("AgricultorLoginPage", () => {
-  afterEach(() => {
+  afterEach(async () => {
     vi.restoreAllMocks();
+    await db.agricultorSession.clear();
   });
 
   it("opens the explanation modal", async () => {

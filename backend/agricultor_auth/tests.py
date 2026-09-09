@@ -76,6 +76,12 @@ class AgricultorMeAndSelosAPITests(APITestCase):
         response = self.client.get(reverse("agricultor-me"))
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
+    def test_me_com_token_invalido_falha(self):
+        response = self.client.get(
+            reverse("agricultor-me"), HTTP_AUTHORIZATION="Bearer this-is-not-a-valid-token"
+        )
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
     def test_me_retorna_nome_e_selos_vazios_inicialmente(self):
         response = self.client.get(reverse("agricultor-me"), **self.auth_headers())
         self.assertEqual(response.status_code, status.HTTP_200_OK)
