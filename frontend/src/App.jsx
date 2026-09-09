@@ -12,6 +12,7 @@ import OrgLayout from "./auth/OrgLayout.jsx";
 import RequireAgricultorAuth from "./auth/RequireAgricultorAuth.jsx";
 import AgricultorLayout from "./auth/AgricultorLayout.jsx";
 import AgricultorInicioPage from "./pages/AgricultorInicioPage.jsx";
+import AgricultorProtocoloPage from "./pages/AgricultorProtocoloPage.jsx";
 
 export default function App() {
   return (
@@ -40,6 +41,7 @@ export default function App() {
         }
       >
         <Route path="/agricultor/inicio" element={<AgricultorInicioPage />} />
+        <Route path="/agricultor/protocolo" element={<AgricultorProtocoloPage />} />
       </Route>
       <Route path="/debug" element={<DebugPage />} />
     </Routes>
