@@ -9,6 +9,9 @@ import AgricultorFormPage from "./pages/AgricultorFormPage.jsx";
 import OrganizacaoPerfilPage from "./pages/OrganizacaoPerfilPage.jsx";
 import RequireOrgAuth from "./auth/RequireOrgAuth.jsx";
 import OrgLayout from "./auth/OrgLayout.jsx";
+import RequireAgricultorAuth from "./auth/RequireAgricultorAuth.jsx";
+import AgricultorLayout from "./auth/AgricultorLayout.jsx";
+import AgricultorInicioPage from "./pages/AgricultorInicioPage.jsx";
 
 export default function App() {
   return (
@@ -29,6 +32,15 @@ export default function App() {
         <Route path="/organizacao/perfil" element={<OrganizacaoPerfilPage />} />
       </Route>
       <Route path="/agricultor" element={<AgricultorLoginPage />} />
+      <Route
+        element={
+          <RequireAgricultorAuth>
+            <AgricultorLayout />
+          </RequireAgricultorAuth>
+        }
+      >
+        <Route path="/agricultor/inicio" element={<AgricultorInicioPage />} />
+      </Route>
       <Route path="/debug" element={<DebugPage />} />
     </Routes>
   );
