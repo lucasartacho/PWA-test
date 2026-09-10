@@ -11,14 +11,14 @@ export default function AgricultorLayout() {
 
   async function handleLogout() {
     await logout();
-    navigate("/agricultor");
+    navigate("/");
   }
 
   return (
     <>
       <AppBar position="static">
         <Toolbar sx={{ justifyContent: "space-between" }}>
-          <Typography variant="h6">Protocolo de Benefícios dos SAFs</Typography>
+          <Typography variant="h6">Benefícios dos SAFs</Typography>
           <Button color="inherit" onClick={handleLogout}>
             Sair
           </Button>

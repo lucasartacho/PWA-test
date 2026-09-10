@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import FormGroup from "@mui/material/FormGroup";
@@ -6,6 +7,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
 import Button from "@mui/material/Button";
 import Alert from "@mui/material/Alert";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { getAgricultorMe, salvarSelos } from "../auth/agricultorApi.js";
 import { SELOS } from "../selos.js";
 import { db } from "../db.js";
@@ -13,6 +15,7 @@ import { db } from "../db.js";
 const PENDENTE_ID = "current";
 
 export default function AgricultorProtocoloPage() {
+  const navigate = useNavigate();
   const [selecionados, setSelecionados] = useState([]);
   const [error, setError] = useState(null);
   const [salvando, setSalvando] = useState(false);
@@ -95,6 +98,20 @@ export default function AgricultorProtocoloPage() {
     }
   }
 
+  if (salvo) {
+    return (
+      <Container maxWidth="sm" sx={{ py: 8, textAlign: "center" }}>
+        <CheckCircleIcon color="success" sx={{ fontSize: 96 }} />
+        <Typography variant="h5" component="h1" sx={{ mt: 2, mb: 4 }}>
+          Selos de benefício salvos.
+        </Typography>
+        <Button variant="contained" onClick={() => navigate("/agricultor/inicio")}>
+          Voltar para tela inicial
+        </Button>
+      </Container>
+    );
+  }
+
   return (
     <Container maxWidth="sm" sx={{ py: 6 }}>
       <Typography variant="h5" component="h1" gutterBottom>
@@ -123,11 +140,6 @@ export default function AgricultorProtocoloPage() {
       {error && (
         <Alert severity="error" sx={{ mb: 2 }}>
           {error}
-        </Alert>
-      )}
-      {salvo && (
-        <Alert severity="success" sx={{ mb: 2 }}>
-          Salvo!
         </Alert>
       )}
       <FormGroup>

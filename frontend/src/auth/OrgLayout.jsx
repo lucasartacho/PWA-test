@@ -11,14 +11,14 @@ export default function OrgLayout() {
 
   async function handleLogout() {
     await logout();
-    navigate("/organizacao");
+    navigate("/");
   }
 
   return (
     <>
       <AppBar position="static">
         <Toolbar sx={{ justifyContent: "space-between" }}>
-          <Typography variant="h6">Protocolo de Benefícios dos SAFs</Typography>
+          <Typography variant="h6">Benefícios dos SAFs</Typography>
           <div>
             <Button color="inherit" component={RouterLink} to="/organizacao/perfil">
               Perfil

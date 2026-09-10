@@ -1,8 +1,17 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { MemoryRouter } from "react-router-dom";
 import AgricultorProtocoloPage from "./AgricultorProtocoloPage.jsx";
 import * as agricultorApi from "../auth/agricultorApi.js";
 import { db } from "../db.js";
+
+function renderPage() {
+  return render(
+    <MemoryRouter>
+      <AgricultorProtocoloPage />
+    </MemoryRouter>
+  );
+}
 
 describe("AgricultorProtocoloPage", () => {
   afterEach(async () => {
@@ -15,23 +24,26 @@ describe("AgricultorProtocoloPage", () => {
       nome: "Maria",
       selos: ["policultivo"],
     });
-    render(<AgricultorProtocoloPage />);
+    renderPage();
 
     const policultivo = screen.getByRole("checkbox", { name: "Policultivo" });
     await waitFor(() => expect(policultivo).toBeChecked());
     expect(screen.getByRole("checkbox", { name: "Solo vivo" })).not.toBeChecked();
   });
 
-  it("saves the selected selos", async () => {
+  it("saves the selected selos and shows the success screen", async () => {
     vi.spyOn(agricultorApi, "getAgricultorMe").mockResolvedValue({ nome: "Maria", selos: [] });
     vi.spyOn(agricultorApi, "salvarSelos").mockResolvedValue({ selos: ["boniteza"] });
-    render(<AgricultorProtocoloPage />);
+    renderPage();
 
     const boniteza = await screen.findByRole("checkbox", { name: "Boniteza" });
     await userEvent.click(boniteza);
     await userEvent.click(screen.getByRole("button", { name: "Salvar" }));
 
-    await waitFor(() => expect(screen.getByText("Salvo!")).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText("Selos de benefício salvos.")).toBeInTheDocument()
+    );
+    expect(screen.getByRole("button", { name: "Voltar para tela inicial" })).toBeInTheDocument();
     expect(agricultorApi.salvarSelos).toHaveBeenCalledWith(["boniteza"]);
   });
 
@@ -39,7 +51,7 @@ describe("AgricultorProtocoloPage", () => {
     vi.spyOn(agricultorApi, "getAgricultorMe").mockRejectedValue(
       new Error("Não foi possível carregar seus dados")
     );
-    render(<AgricultorProtocoloPage />);
+    renderPage();
     await waitFor(() =>
       expect(screen.getByText("Não foi possível carregar seus dados")).toBeInTheDocument()
     );
@@ -47,7 +59,7 @@ describe("AgricultorProtocoloPage", () => {
 
   it("renders the checkboxes immediately even when the initial load fails offline", async () => {
     vi.spyOn(agricultorApi, "getAgricultorMe").mockRejectedValue(new TypeError("Failed to fetch"));
-    render(<AgricultorProtocoloPage />);
+    renderPage();
 
     expect(screen.getByRole("checkbox", { name: "Boniteza" })).not.toBeChecked();
     expect(screen.queryByText(/não foi possível/i)).not.toBeInTheDocument();
@@ -59,7 +71,7 @@ describe("AgricultorProtocoloPage", () => {
     const salvarSelosSpy = vi.spyOn(agricultorApi, "salvarSelos");
     vi.spyOn(window.navigator, "onLine", "get").mockReturnValue(false);
 
-    render(<AgricultorProtocoloPage />);
+    renderPage();
 
     const boniteza = await screen.findByRole("checkbox", { name: "Boniteza" });
     await userEvent.click(boniteza);
@@ -78,7 +90,7 @@ describe("AgricultorProtocoloPage", () => {
     vi.spyOn(agricultorApi, "getAgricultorMe").mockResolvedValue({ nome: "Maria", selos: [] });
     vi.spyOn(agricultorApi, "salvarSelos").mockResolvedValue({ selos: ["boniteza"] });
 
-    render(<AgricultorProtocoloPage />);
+    renderPage();
 
     const boniteza = await screen.findByRole("checkbox", { name: "Boniteza" });
     expect(boniteza).toBeChecked();
@@ -88,7 +100,9 @@ describe("AgricultorProtocoloPage", () => {
 
     await userEvent.click(screen.getByRole("button", { name: "Enviar agora" }));
 
-    await waitFor(() => expect(screen.getByText("Salvo!")).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText("Selos de benefício salvos.")).toBeInTheDocument()
+    );
     expect(agricultorApi.salvarSelos).toHaveBeenCalledWith(["boniteza"]);
     expect(await db.agricultorSelosPendentes.get("current")).toBeUndefined();
   });

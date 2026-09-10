@@ -29,7 +29,7 @@ export default function IndexPage() {
   return (
     <Container maxWidth="sm" sx={{ py: 8 }}>
       <Typography variant="h4" component="h1" gutterBottom>
-        Protocolo de Benefícios dos SAFs
+        Benefícios dos SAFs
       </Typography>
       <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
         Como você quer acessar?
