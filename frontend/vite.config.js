@@ -7,14 +7,28 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: "autoUpdate",
+      devOptions: {
+        enabled: true,
+      },
       manifest: {
-        name: "PWA Test",
-        short_name: "PWA Test",
+        name: "Benefícios dos SAFs",
+        short_name: "Benefícios SAFs",
         start_url: "/",
         display: "standalone",
-        background_color: "#ffffff",
-        theme_color: "#1a1a1a",
-        icons: [],
+        background_color: "#F5F0E6",
+        theme_color: "#4B7355",
+        icons: [
+          {
+            src: "/icons/icon-192.png",
+            sizes: "192x192",
+            type: "image/png",
+          },
+          {
+            src: "/icons/icon-512.png",
+            sizes: "512x512",
+            type: "image/png",
+          },
+        ],
       },
     }),
   ],
